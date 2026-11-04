@@ -1,0 +1,80 @@
+{
+  "user": {
+    "id": "janaina",
+    "name": "Janaína Brito",
+    "avatar": "👩‍👧",
+    "monthlyIncome": 2400.00,
+    "occupation": "Dona de casa"
+  },
+  "transactions": [
+    { "id": "n001", "personaId": "janaina", "date": "2025-07-01", "description": "Renda família julho", "amount": 2400.00, "category": "salary", "source": "simulated" },
+    { "id": "n002", "personaId": "janaina", "date": "2025-07-01", "description": "Aluguel", "amount": -850.00, "category": "housing", "source": "simulated" },
+    { "id": "n003", "personaId": "janaina", "date": "2025-07-02", "description": "Supermercado Boa Esperança", "amount": -420.00, "category": "food", "source": "simulated" },
+    { "id": "n004", "personaId": "janaina", "date": "2025-07-03", "description": "Ônibus escolar filhos", "amount": -200.00, "category": "transport", "source": "simulated" },
+    { "id": "n005", "personaId": "janaina", "date": "2025-07-04", "description": "Farmácia - remédio filho", "amount": -68.00, "category": "health", "source": "simulated" },
+    { "id": "n006", "personaId": "janaina", "date": "2025-07-05", "description": "Material escolar", "amount": -135.00, "category": "education", "source": "simulated" },
+    { "id": "n007", "personaId": "janaina", "date": "2025-07-06", "description": "Conta de água", "amount": -75.00, "category": "housing", "source": "simulated" },
+    { "id": "n008", "personaId": "janaina", "date": "2025-07-07", "description": "Mercadinho bairro", "amount": -95.50, "category": "food", "source": "simulated" },
+    { "id": "n009", "personaId": "janaina", "date": "2025-07-08", "description": "Conta de luz", "amount": -135.00, "category": "housing", "source": "simulated" },
+    { "id": "n010", "personaId": "janaina", "date": "2025-07-09", "description": "Remédio pressão", "amount": -42.00, "category": "health", "source": "simulated" },
+    { "id": "n011", "personaId": "janaina", "date": "2025-07-10", "description": "Padaria", "amount": -55.00, "category": "food", "source": "simulated" },
+    { "id": "n012", "personaId": "janaina", "date": "2025-07-11", "description": "Passagem ônibus", "amount": -35.00, "category": "transport", "source": "simulated" },
+    { "id": "n013", "personaId": "janaina", "date": "2025-07-12", "description": "Açougue", "amount": -89.00, "category": "food", "source": "simulated" },
+    { "id": "n014", "personaId": "janaina", "date": "2025-07-14", "description": "Internet residencial", "amount": -79.90, "category": "housing", "source": "simulated" },
+    { "id": "n015", "personaId": "janaina", "date": "2025-07-15", "description": "Feira livre", "amount": -70.00, "category": "food", "source": "simulated" },
+    { "id": "n016", "personaId": "janaina", "date": "2025-07-17", "description": "Consulta médica filho", "amount": -80.00, "category": "health", "source": "simulated" },
+    { "id": "n017", "personaId": "janaina", "date": "2025-07-18", "description": "Mercado extra", "amount": -112.00, "category": "food", "source": "simulated" },
+    { "id": "n018", "personaId": "janaina", "date": "2025-07-20", "description": "Conserto torneira", "amount": -90.00, "category": "housing", "source": "simulated" },
+    { "id": "n019", "personaId": "janaina", "date": "2025-07-22", "description": "Roupa filhos", "amount": -145.00, "category": "other", "source": "simulated" },
+    { "id": "n020", "personaId": "janaina", "date": "2025-07-25", "description": "Lazer domingo família", "amount": -60.00, "category": "entertainment", "source": "simulated" }
+  ],
+  "budgetLimits": {
+    "food": 700.00,
+    "transport": 250.00,
+    "housing": 1200.00,
+    "health": 200.00,
+    "education": 150.00,
+    "entertainment": 100.00,
+    "other": 150.00
+  },
+  "goals": [
+    {
+      "id": "g101",
+      "personaId": "janaina",
+      "title": "Reserva de emergência",
+      "emoji": "🛡️",
+      "targetAmount": 5000.00,
+      "currentAmount": 800.00,
+      "deadline": "2026-06-30",
+      "progress": 16.00
+    },
+    {
+      "id": "g102",
+      "personaId": "janaina",
+      "title": "Reforma do banheiro",
+      "emoji": "🚿",
+      "targetAmount": 2500.00,
+      "currentAmount": 400.00,
+      "deadline": "2025-12-31",
+      "progress": 16.00
+    }
+  ],
+  "gamification": {
+    "personaId": "janaina",
+    "points": 180,
+    "level": 2,
+    "levelLabel": "Organizando a vida",
+    "nextLevelPoints": 350,
+    "missions": [
+      { "id": "m101", "title": "Primeiros passos", "description": "Acesse o app por 3 dias seguidos.", "points": 30, "completed": true, "icon": "👣" },
+      { "id": "m102", "title": "Controle de mercado", "description": "Mantenha gastos com alimentação abaixo do limite.", "points": 80, "completed": false, "icon": "🛒" },
+      { "id": "m103", "title": "Sonho criado", "description": "Adicione um objetivo financeiro.", "points": 30, "completed": true, "icon": "💭" },
+      { "id": "m104", "title": "Mês saudável", "description": "Feche o mês com saldo positivo.", "points": 150, "completed": false, "icon": "📅" }
+    ],
+    "achievements": [
+      { "id": "a101", "title": "Começo é o começo", "description": "Acessou o Tokeni pela primeira vez.", "icon": "🌱", "unlockedAt": "2025-07-01" },
+      { "id": "a102", "title": "Sonhadora", "description": "Criou um objetivo financeiro.", "icon": "✨", "unlockedAt": "2025-07-02" },
+      { "id": "a103", "title": "Guardiã do lar", "description": "Manteve moradia dentro do orçamento.", "icon": "🏠", "unlockedAt": null }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "roots": ["<rootDir>/tests"],
+  "moduleNameMapper": {
+    "nanoid": "<rootDir>/tests/__mocks__/nanoid.js"
+  }
+}

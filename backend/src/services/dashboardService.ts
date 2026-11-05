@@ -24,7 +24,7 @@ export const DashboardService = {
       .map(c => ({
         id: `alert-${c.category}`,
         type: 'over_budget' as const,
-        message: `Você ultrapassou o limite de ${c.label} este mês.`,
+        message: `Você ultrapassou o limite com ${c.label} este mês.`,
         category: c.category,
       }))
 

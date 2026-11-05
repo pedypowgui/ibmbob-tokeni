@@ -3,7 +3,7 @@ import { BudgetProgress } from '../../components/BudgetProgress'
 import { formatCurrency, formatMonth, categoryLabel } from '../../utils/format'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 
-const COLORS = ['#1a4731', '#2d6a4f', '#52b788', '#95d5b2', '#b7e4c7', '#d8f3dc', '#7c3aed', '#a78bfa']
+const COLORS = ['#0e5131', '#186c45', '#328a61', '#47a579', '#69bc95', '#8ad3b1', '#7c3aed', '#a78bfa']
 
 export function BudgetView() {
   const { budget, loading, error } = useBudgetController()
@@ -42,7 +42,7 @@ export function BudgetView() {
       {pieData.length > 0 && (
         <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 mb-4">
           <p className="text-sm font-semibold mb-3">Distribuição de gastos</p>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                 {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}

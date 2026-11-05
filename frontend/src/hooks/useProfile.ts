@@ -13,17 +13,32 @@ export interface ConnectedBank {
 }
 
 const DEFAULT_BANKS: ConnectedBank[] = [
-  { id: 'nubank',    name: 'Nubank',          icon: '🟣', connected: false },
-  { id: 'itau',     name: 'Itaú',             icon: '🟠', connected: false },
-  { id: 'bradesco', name: 'Bradesco',          icon: '🔴', connected: false },
-  { id: 'bb',       name: 'Banco do Brasil',  icon: '🟡', connected: false },
-  { id: 'inter',    name: 'Banco Inter',       icon: '🟤', connected: false },
-  { id: 'c6',       name: 'C6 Bank',           icon: '⚫', connected: false },
-  { id: 'sicoob',   name: 'Sicoob',            icon: '🟢', connected: false },
+  { id: 'nubank',    name: 'Nubank',          icon: '/banks/nubank.png',   connected: false },
+  { id: 'itau',     name: 'Itaú',             icon: '/banks/itau.jpg',      connected: false },
+  { id: 'bradesco', name: 'Bradesco',          icon: '/banks/bradesco.webp', connected: false },
+  { id: 'bb',       name: 'Banco do Brasil',  icon: '/banks/bb.jpg',        connected: false },
+  { id: 'inter',    name: 'Banco Inter',       icon: '/banks/inter.png',     connected: false },
+  { id: 'c6',       name: 'C6 Bank',           icon: '/banks/c6.jpg',        connected: false },
+  { id: 'sicoob',   name: 'Sicoob',            icon: '/banks/sicoob.jpg',    connected: false },
 ]
 
 function bankStorageKey(personaId: PersonaId) {
   return `tokeni_banks_${personaId}`
+}
+
+/** Mescla o estado `connected` salvo com os ícones/nomes atuais de DEFAULT_BANKS */
+function mergeStoredBanks(personaId: PersonaId): ConnectedBank[] {
+  try {
+    const stored = localStorage.getItem(bankStorageKey(personaId))
+    if (stored) {
+      const parsed = JSON.parse(stored) as ConnectedBank[]
+      return DEFAULT_BANKS.map(def => {
+        const saved = parsed.find(b => b.id === def.id)
+        return saved ? { ...def, connected: saved.connected } : def
+      })
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_BANKS
 }
 
 function nameStorageKey(personaId: PersonaId) {
@@ -40,23 +55,14 @@ export function useProfile(personaId: PersonaId | null) {
 
   const [banks, setBanksState] = useState<ConnectedBank[]>(() => {
     if (!personaId) return DEFAULT_BANKS
-    try {
-      const stored = localStorage.getItem(bankStorageKey(personaId))
-      if (stored) return JSON.parse(stored) as ConnectedBank[]
-    } catch { /* ignore */ }
-    return DEFAULT_BANKS
+    return mergeStoredBanks(personaId)
   })
 
   // Re-sync when personaId changes
   useEffect(() => {
     if (!personaId) return
     setDisplayNameState(localStorage.getItem(nameStorageKey(personaId)) ?? PERSONAS[personaId].name)
-    try {
-      const stored = localStorage.getItem(bankStorageKey(personaId))
-      setBanksState(stored ? JSON.parse(stored) : DEFAULT_BANKS)
-    } catch {
-      setBanksState(DEFAULT_BANKS)
-    }
+    setBanksState(mergeStoredBanks(personaId))
   }, [personaId])
 
   function saveName(name: string) {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Sparkles, Star, Lock, CheckCircle2, Circle, ChevronRight, Trophy,
-  Zap, Target, ArrowRight, X, Plus,
+  Zap, Target, ArrowRight, X, Plus, Map,
 } from 'lucide-react'
 import { useDreamsController } from './useDreamsController'
 import type { JourneyDetail, JourneyLevel, JourneyMission, FinancialGoal } from '../../types'
@@ -23,7 +23,7 @@ function ProgressBar({ value, color = 'bg-[var(--color-primary)]' }: { value: nu
 
 function XpBadge({ xp }: { xp: number }) {
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-achievement)] bg-opacity-15 text-[var(--color-achievement)] text-[11px] font-semibold">
+    <span className="max-w-16 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-achievement)] bg-opacity-15 text-orange-100 text-[11px] font-semibold">
       <Zap size={10} />
       {xp} XP
     </span>
@@ -370,7 +370,7 @@ function ActiveJourneyCard({
       {/* Missão principal */}
       {mainMission && (
         <div>
-          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">🎯 Missão principal</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2 flex items-center gap-1.5"><Target size={14} /> Missão principal</h3>
           <MissionCard mission={mainMission} onComplete={onComplete} loading={loading} />
         </div>
       )}
@@ -378,7 +378,7 @@ function ActiveJourneyCard({
       {/* Missões secundárias */}
       {secondaryMissions.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">⭐ Missões secundárias</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2 flex items-center gap-1.5"><Star size={14} /> Missões secundárias</h3>
           <div className="flex flex-col gap-2">
             {secondaryMissions.map(m => (
               <MissionCard key={m.id} mission={m} onComplete={onComplete} loading={loading} />
@@ -389,7 +389,7 @@ function ActiveJourneyCard({
 
       {/* Todas as etapas */}
       <div>
-        <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">🗺️ Todas as etapas</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2 flex items-center gap-1.5"><Map size={14} /> Todas as etapas</h3>
         <div className="flex flex-col gap-2">
           {journey.levels.map(level => (
             <LevelCard
@@ -434,7 +434,7 @@ function CompletedJourneyCard({
         }
       </div>
       <div>
-        <h2 className="text-lg font-bold text-[var(--color-text)]">Sonho conquistado! 🎉</h2>
+        <h2 className="text-lg font-bold text-[var(--color-text)] flex items-center justify-center gap-2"><Trophy size={18} className="text-[var(--color-achievement)]" /> Sonho conquistado!</h2>
         <p className="text-sm text-[var(--color-muted)] mt-1 max-w-xs leading-relaxed">
           Você completou <strong>"{journey.title}"</strong>!
         </p>
@@ -672,8 +672,8 @@ export function DreamsView() {
         <div className="flex items-center gap-2">
           {totalXp > 0 && (
             <div className="flex items-center gap-1 px-2.5 py-1.5 bg-[var(--color-achievement)] bg-opacity-10 rounded-xl">
-              <Zap size={13} className="text-[var(--color-achievement)]" />
-              <span className="text-xs font-bold text-[var(--color-achievement)]">{totalXp} XP</span>
+              <Zap size={13} className="text-orange-100" />
+              <span className="text-xs font-bold text-orange-100">{totalXp} XP</span>
             </div>
           )}
           <button

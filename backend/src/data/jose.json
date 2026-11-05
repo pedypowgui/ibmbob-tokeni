@@ -8,7 +8,7 @@
   },
   "transactions": [
     { "id": "j001", "personaId": "jose", "date": "2025-07-01", "description": "Salário julho", "amount": 3200.00, "category": "salary", "source": "simulated" },
-    { "id": "j002", "personaId": "jose", "date": "2025-07-02", "description": "Supermercado Extra", "amount": -340.50, "category": "food", "source": "simulated" },
+    { "id": "j002", "personaId": "jose", "date": "2025-07-02", "description": "Supermercado Extra", "amount": -300.50, "category": "food", "source": "simulated" },
     { "id": "j003", "personaId": "jose", "date": "2025-07-03", "description": "Uber - trabalho", "amount": -28.90, "category": "transport", "source": "simulated" },
     { "id": "j004", "personaId": "jose", "date": "2025-07-04", "description": "Aluguel", "amount": -900.00, "category": "housing", "source": "simulated" },
     { "id": "j005", "personaId": "jose", "date": "2025-07-05", "description": "Netflix", "amount": -39.90, "category": "entertainment", "source": "simulated" },
@@ -17,13 +17,11 @@
     { "id": "j008", "personaId": "jose", "date": "2025-07-08", "description": "Passagem ônibus mensal", "amount": -180.00, "category": "transport", "source": "simulated" },
     { "id": "j009", "personaId": "jose", "date": "2025-07-09", "description": "Curso online Udemy", "amount": -49.90, "category": "education", "source": "simulated" },
     { "id": "j010", "personaId": "jose", "date": "2025-07-10", "description": "Spotify", "amount": -19.90, "category": "entertainment", "source": "simulated" },
-    { "id": "j011", "personaId": "jose", "date": "2025-07-11", "description": "Padaria do centro", "amount": -32.00, "category": "food", "source": "simulated" },
     { "id": "j012", "personaId": "jose", "date": "2025-07-12", "description": "Academia", "amount": -89.90, "category": "health", "source": "simulated" },
     { "id": "j013", "personaId": "jose", "date": "2025-07-14", "description": "Bar com amigos", "amount": -95.00, "category": "entertainment", "source": "simulated" },
     { "id": "j014", "personaId": "jose", "date": "2025-07-15", "description": "Mercadinho bairro", "amount": -78.40, "category": "food", "source": "simulated" },
     { "id": "j015", "personaId": "jose", "date": "2025-07-16", "description": "Gasolina moto", "amount": -65.00, "category": "transport", "source": "simulated" },
     { "id": "j016", "personaId": "jose", "date": "2025-07-18", "description": "Cinema com namorada", "amount": -60.00, "category": "entertainment", "source": "simulated" },
-    { "id": "j017", "personaId": "jose", "date": "2025-07-20", "description": "Restaurante almoço", "amount": -38.50, "category": "food", "source": "simulated" },
     { "id": "j018", "personaId": "jose", "date": "2025-07-22", "description": "Steam - jogo", "amount": -79.90, "category": "entertainment", "source": "simulated" },
     { "id": "j019", "personaId": "jose", "date": "2025-07-24", "description": "Conta de luz", "amount": -120.00, "category": "housing", "source": "simulated" },
     { "id": "j020", "personaId": "jose", "date": "2025-07-25", "description": "Internet", "amount": -99.90, "category": "housing", "source": "simulated" }

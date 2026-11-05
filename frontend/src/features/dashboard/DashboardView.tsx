@@ -179,7 +179,11 @@ function ProfileDrawer({
                   className="flex items-center justify-between bg-[var(--color-bg)] rounded-2xl px-4 py-3"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-xl">{bank.icon}</span>
+                    <img
+                      src={bank.icon}
+                      alt={bank.name}
+                      className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
+                    />
                     <div>
                       <p className="text-sm font-medium text-[var(--color-text)]">{bank.name}</p>
                       <p className="text-[11px] text-[var(--color-muted)]">
@@ -198,9 +202,6 @@ function ProfileDrawer({
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-[var(--color-muted)] mt-2 px-1">
-              A conexão com bancos é simulada nesta versão demo.
-            </p>
           </section>
 
           <div className="h-px bg-[var(--color-border)]" />
@@ -221,7 +222,7 @@ function ProfileDrawer({
 
         {/* Footer */}
         <div className="px-5 pb-safe pb-5 pt-3 border-t border-[var(--color-border)]">
-          <p className="text-[11px] text-[var(--color-muted)] text-center">tokeni · versão demo</p>
+          <p className="text-[11px] text-[var(--color-muted)] text-center">tokeni</p>
         </div>
       </div>
     </>
@@ -251,7 +252,7 @@ export function DashboardView() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-xs text-[var(--color-muted)]">Bem-vindo de volta</p>
-          <h1 className="text-xl font-bold text-[var(--color-text)]">Olá, {firstName} 👋</h1>
+          <h1 className="text-xl font-bold text-[var(--color-text)]">Olá, {firstName}</h1>
         </div>
         <button
           onClick={() => setSettingsOpen(true)}

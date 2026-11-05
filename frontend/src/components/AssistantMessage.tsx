@@ -1,3 +1,5 @@
+import { Bot } from 'lucide-react'
+
 interface AssistantMessageProps {
   role: 'user' | 'assistant'
   content: string
@@ -9,8 +11,8 @@ export function AssistantMessage({ role, content, timestamp }: AssistantMessageP
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-[var(--color-ai-light)] flex items-center justify-center text-sm mr-2 flex-shrink-0 self-end">
-          🤖
+        <div className="w-8 h-8 rounded-full bg-[var(--color-ai-light)] flex items-center justify-center mr-2 flex-shrink-0 self-end">
+          <Bot size={16} className="text-[var(--color-ai)]" />
         </div>
       )}
       <div

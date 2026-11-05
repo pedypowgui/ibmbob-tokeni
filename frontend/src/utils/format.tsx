@@ -1,3 +1,8 @@
+import type { ReactElement } from 'react'
+import {
+  UtensilsCrossed, Bus, Pill, BookOpen, Gamepad2,
+  Home, Banknote, Package,
+} from 'lucide-react'
 import type { TransactionCategory } from '../types'
 
 export function formatCurrency(value: number): string {
@@ -34,21 +39,21 @@ const CATEGORY_LABELS: Record<TransactionCategory, string> = {
   other: 'Outros',
 }
 
-const CATEGORY_ICONS: Record<TransactionCategory, string> = {
-  food: '🍽️',
-  transport: '🚌',
-  health: '💊',
-  education: '📚',
-  entertainment: '🎮',
-  housing: '🏠',
-  salary: '💰',
-  other: '📦',
+const CATEGORY_ICON_MAP: Record<TransactionCategory, ReactElement> = {
+  food:          <UtensilsCrossed size={18} />,
+  transport:     <Bus size={18} />,
+  health:        <Pill size={18} />,
+  education:     <BookOpen size={18} />,
+  entertainment: <Gamepad2 size={18} />,
+  housing:       <Home size={18} />,
+  salary:        <Banknote size={18} />,
+  other:         <Package size={18} />,
 }
 
 export function categoryLabel(category: TransactionCategory): string {
   return CATEGORY_LABELS[category] ?? 'Outros'
 }
 
-export function categoryIcon(category: TransactionCategory): string {
-  return CATEGORY_ICONS[category] ?? '📦'
+export function categoryIcon(category: TransactionCategory): ReactElement {
+  return CATEGORY_ICON_MAP[category] ?? <Package size={18} />
 }

@@ -53,7 +53,7 @@ export function useDreamsController() {
       try {
         const goal = await createGoal(personaId, payload)
         await load()
-        setNotification(`"${goal.title}" adicionado como sonho! Revise e aprove sua jornada. ✨`)
+        setNotification(`"${goal.title}" adicionado como sonho! Revise e aprove sua jornada.`)
         return goal
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao criar sonho')
@@ -72,7 +72,7 @@ export function useDreamsController() {
     try {
       await approveJourney(personaId, journeyId)
       await load()
-      setNotification('Jornada aprovada! Sua aventura financeira começa agora. +50 XP 🎉')
+      setNotification('Jornada aprovada! Sua aventura financeira começa agora. +50 XP')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao aprovar jornada')
     } finally {
@@ -103,9 +103,9 @@ export function useDreamsController() {
       try {
         const result = await completeMission(personaId, missionId)
         await load()
-        const msgs = [`+${result.xpGained} XP conquistados! 🌟`]
-        if (result.levelAdvanced) msgs.push('Você avançou de nível! 🚀')
-        if (result.journeyCompleted) msgs.push('Sonho concluído! Parabéns! 🏆')
+        const msgs = [`+${result.xpGained} XP conquistados!`]
+        if (result.levelAdvanced) msgs.push('Você avançou de nível!')
+        if (result.journeyCompleted) msgs.push('Sonho concluído! Parabéns!')
         setNotification(msgs.join(' '))
         return result
       } catch (err) {

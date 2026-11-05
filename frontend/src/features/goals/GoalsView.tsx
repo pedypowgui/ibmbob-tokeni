@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X, Target, CheckCircle2, Circle, Lock, Zap } from 'lucide-react'
+import { Plus, X, Target, CheckCircle2, Circle, Lock, Zap, Map } from 'lucide-react'
 import { useGoalsController } from './useGoalsController'
 import type { FinancialGoal } from '../../types'
 
@@ -159,7 +159,7 @@ function GoalTrailCard({ goal }: { goal: FinancialGoal }) {
 
       {/* Trail stages */}
       <div>
-        <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">🗺️ Trilha da meta</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2 flex items-center gap-1.5"><Map size={14} /> Trilha da meta</h3>
         <div className="flex flex-col gap-2">
           {STAGES.filter(s => s.max !== Infinity || progress >= 100).map(stage => {
             const isDone = progress >= stage.max || (stage.max === Infinity && progress >= 100)

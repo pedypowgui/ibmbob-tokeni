@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Trash2, Sparkles } from 'lucide-react'
+import { Send, Trash2, Sparkles, Bot } from 'lucide-react'
 import { useAssistantController } from './useAssistantController'
 import { AssistantMessage } from '../../components/AssistantMessage'
 
@@ -56,8 +56,8 @@ export function AssistantView() {
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-[var(--color-ai-light)] flex items-center justify-center text-3xl">
-              🤖
+            <div className="w-16 h-16 rounded-2xl bg-[var(--color-ai-light)] flex items-center justify-center">
+              <Bot size={32} className="text-[var(--color-ai)]" />
             </div>
             <p className="text-sm text-center text-[var(--color-muted)] max-w-[200px]">
               Olá! Sou seu assistente financeiro. Como posso ajudar?

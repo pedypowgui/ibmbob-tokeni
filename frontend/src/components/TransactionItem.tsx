@@ -10,7 +10,7 @@ export function TransactionItem({ transaction }: TransactionItemProps) {
 
   return (
     <div className="flex items-center gap-3 py-3 border-b border-[var(--color-border)] last:border-0">
-      <div className="w-10 h-10 rounded-full bg-[var(--color-bg)] flex items-center justify-center text-lg flex-shrink-0">
+      <div className="w-10 h-10 rounded-full bg-[var(--color-bg)] flex items-center justify-center text-[var(--color-muted)] flex-shrink-0">
         {categoryIcon(transaction.category)}
       </div>
       <div className="flex-1 min-w-0">

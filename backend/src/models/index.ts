@@ -1,6 +1,6 @@
 // ─── User / Persona ───────────────────────────────────────────────────────────
 
-export type PersonaId = 'janaina' | 'jose'
+export type PersonaId = 'jose'
 
 export interface User {
   id: PersonaId

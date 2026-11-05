@@ -25,7 +25,7 @@ function load(personaId: PersonaId): PersonaData {
 
 export const UserRepository = {
   findAll(): User[] {
-    return (['janaina', 'jose'] as PersonaId[]).map(id => load(id).user)
+    return (['jose'] as PersonaId[]).map(id => load(id).user)
   },
   findById(id: PersonaId): User | null {
     try { return load(id).user } catch { return null }

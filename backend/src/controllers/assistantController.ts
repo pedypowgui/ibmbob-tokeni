@@ -4,7 +4,7 @@ import { ok, fail } from '../models'
 import { z } from 'zod'
 
 const chatSchema = z.object({
-  personaId: z.enum(['janaina', 'jose']),
+  personaId: z.enum(['jose']),
   message: z.string().min(1).max(1000),
   history: z.array(z.object({
     role: z.enum(['user', 'assistant']),

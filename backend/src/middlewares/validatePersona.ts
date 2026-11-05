@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import { fail } from '../models'
 
-const VALID_PERSONAS = ['janaina', 'jose']
+const VALID_PERSONAS = ['jose']
 
 export function validatePersona(req: Request, res: Response, next: NextFunction): void {
   const personaId = String(req.params.personaId)

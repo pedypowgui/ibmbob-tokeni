@@ -1,19 +1,20 @@
-import { Sparkles, Star, Lock, CheckCircle2, Circle, ChevronRight, Trophy, Zap, Target, ArrowRight, X } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Sparkles, Star, Lock, CheckCircle2, Circle, ChevronRight, Trophy,
+  Zap, Target, ArrowRight, X, Plus,
+} from 'lucide-react'
 import { useDreamsController } from './useDreamsController'
-import type { JourneyDetail, JourneyLevel, JourneyMission } from '../../types'
+import type { JourneyDetail, JourneyLevel, JourneyMission, FinancialGoal } from '../../types'
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
 
-function ProgressBar({ value, color = 'bg-[var(--color-primary)]', label }: { value: number; color?: string; label?: string }) {
+function ProgressBar({ value, color = 'bg-[var(--color-primary)]' }: { value: number; color?: string }) {
   return (
-    <div>
-      {label && <span className="text-[11px] text-[var(--color-muted)]">{label}</span>}
-      <div className="h-2 bg-[var(--color-border)] rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${color}`}
-          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
-        />
-      </div>
+    <div className="h-2 bg-[var(--color-border)] rounded-full overflow-hidden">
+      <div
+        className={`h-full rounded-full transition-all duration-500 ${color}`}
+        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+      />
     </div>
   )
 }
@@ -94,20 +95,16 @@ function MissionCard({
           <XpBadge xp={mission.rewardXp} />
           <span className="text-[10px] text-[var(--color-muted)]">{completionLabel(mission.completionType)}</span>
         </div>
-
         {isAvailable && !isDone && (
           <button
             onClick={() => onComplete(mission.id)}
             disabled={loading}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--color-primary)] text-white text-[12px] font-medium rounded-xl disabled:opacity-50 hover:bg-[var(--color-primary-light)] transition-colors"
           >
-            Concluir
-            <ChevronRight size={12} />
+            Concluir <ChevronRight size={12} />
           </button>
         )}
-        {isDone && (
-          <span className="text-[12px] text-[var(--color-success)] font-medium">Concluída ✓</span>
-        )}
+        {isDone && <span className="text-[12px] text-[var(--color-success)] font-medium">Concluída ✓</span>}
       </div>
     </div>
   )
@@ -135,29 +132,22 @@ function LevelCard({
   return (
     <div
       className={`rounded-2xl border overflow-hidden ${
-        isDone
-          ? 'border-[var(--color-primary)]'
-          : isCurrent
-          ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20'
+        isDone ? 'border-[var(--color-primary)]'
+          : isCurrent ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20'
           : 'border-[var(--color-border)]'
       }`}
     >
-      {/* Level header */}
       <div
         className={`flex items-center gap-3 px-4 py-3 ${
-          isDone
-            ? 'bg-[var(--color-primary-muted)]'
-            : isCurrent
-            ? 'bg-[var(--color-primary)]'
+          isDone ? 'bg-[var(--color-primary-muted)]'
+            : isCurrent ? 'bg-[var(--color-primary)]'
             : 'bg-[var(--color-bg)]'
         }`}
       >
         <div
           className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-            isDone
-              ? 'bg-[var(--color-primary)] text-white'
-              : isCurrent
-              ? 'bg-white text-[var(--color-primary)]'
+            isDone ? 'bg-[var(--color-primary)] text-white'
+              : isCurrent ? 'bg-white text-[var(--color-primary)]'
               : 'bg-[var(--color-border)] text-[var(--color-muted)]'
           }`}
         >
@@ -167,12 +157,8 @@ function LevelCard({
           <div className={`text-sm font-bold ${isCurrent ? 'text-white' : 'text-[var(--color-text)]'}`}>
             Nível {level.order} — {level.title}
           </div>
-          {isCurrent && (
-            <div className="text-[11px] text-green-200 mt-0.5">Em andamento</div>
-          )}
-          {isDone && (
-            <div className="text-[11px] text-[var(--color-success)] mt-0.5">Concluído</div>
-          )}
+          {isCurrent && <div className="text-[11px] text-green-200 mt-0.5">Em andamento</div>}
+          {isDone && <div className="text-[11px] text-[var(--color-success)] mt-0.5">Concluído</div>}
           {isLocked && (
             <div className="text-[11px] text-[var(--color-muted)] mt-0.5 flex items-center gap-1">
               <Lock size={10} /> Bloqueado
@@ -181,7 +167,6 @@ function LevelCard({
         </div>
       </div>
 
-      {/* Level body */}
       {!isLocked && (
         <div className="px-4 py-3 bg-white flex flex-col gap-2">
           <p className="text-[12px] text-[var(--color-muted)]">{level.objective}</p>
@@ -198,39 +183,9 @@ function LevelCard({
   )
 }
 
-// ─── Empty State ─────────────────────────────────────────────────────────────
-
-function EmptyState({ onCreateJourney, loading }: { onCreateJourney: () => void; loading: boolean }) {
-  return (
-    <div className="flex flex-col items-center justify-center flex-1 px-6 py-12 text-center gap-6">
-      <div className="w-20 h-20 rounded-3xl bg-[var(--color-primary-muted)] flex items-center justify-center">
-        <Star size={36} className="text-[var(--color-primary)]" />
-      </div>
-      <div>
-        <h2 className="text-xl font-bold text-[var(--color-text)] mb-2">Qual é o seu próximo sonho?</h2>
-        <p className="text-sm text-[var(--color-muted)] max-w-xs leading-relaxed">
-          Converse com o Tokeni e descubra como transformar seu objetivo em um plano possível, passo a passo.
-        </p>
-      </div>
-      <button
-        onClick={onCreateJourney}
-        disabled={loading}
-        className="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-2xl disabled:opacity-50 hover:bg-[var(--color-primary-light)] transition-colors"
-      >
-        <Sparkles size={18} />
-        {loading ? 'Criando...' : 'Criar minha jornada'}
-        <ArrowRight size={16} />
-      </button>
-      <p className="text-[11px] text-[var(--color-muted)]">
-        Seu plano será personalizado com base na sua situação financeira real.
-      </p>
-    </div>
-  )
-}
-
 // ─── Pending Approval State ───────────────────────────────────────────────────
 
-function PendingApprovalState({
+function PendingApprovalCard({
   journey,
   onApprove,
   onCancel,
@@ -242,22 +197,20 @@ function PendingApprovalState({
   loading: boolean
 }) {
   return (
-    <div className="flex flex-col gap-4">
-      {/* Summary card */}
+    <div className="flex flex-col gap-3">
       <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary-muted)] flex items-center justify-center">
-            <Target size={20} className="text-[var(--color-primary)]" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary-muted)] flex items-center justify-center text-2xl flex-shrink-0">
+            {journey.emoji ?? '✨'}
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-base font-bold text-[var(--color-text)]">{journey.title}</h2>
-            <span className="text-[11px] text-[var(--color-muted)] px-2 py-0.5 bg-yellow-50 border border-yellow-200 rounded-full">
+            <span className="text-[11px] px-2 py-0.5 bg-yellow-50 border border-yellow-200 rounded-full text-yellow-700">
               Aguardando aprovação
             </span>
           </div>
         </div>
         <p className="text-sm text-[var(--color-muted)] leading-relaxed">{journey.description}</p>
-
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-[var(--color-bg)] rounded-xl px-3 py-2">
             <div className="text-[10px] text-[var(--color-muted)]">Meta financeira</div>
@@ -272,7 +225,6 @@ function PendingApprovalState({
         </div>
       </div>
 
-      {/* Levels preview */}
       <div className="flex flex-col gap-2">
         <h3 className="text-sm font-semibold text-[var(--color-text)] px-1">Etapas da jornada</h3>
         {journey.levels.map((level, idx) => (
@@ -290,8 +242,7 @@ function PendingApprovalState({
         ))}
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col gap-2 mt-2">
+      <div className="flex flex-col gap-2">
         <button
           onClick={() => onApprove(journey.id)}
           disabled={loading}
@@ -303,7 +254,7 @@ function PendingApprovalState({
         <button
           onClick={() => onCancel(journey.id)}
           disabled={loading}
-          className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-[var(--color-border)] text-[var(--color-muted)] font-medium rounded-2xl disabled:opacity-50 hover:border-[var(--color-danger)] hover:text-[var(--color-danger)] transition-colors"
+          className="w-full py-3 bg-white border border-[var(--color-border)] text-[var(--color-muted)] font-medium rounded-2xl disabled:opacity-50 hover:border-[var(--color-danger)] hover:text-[var(--color-danger)] transition-colors"
         >
           Cancelar proposta
         </button>
@@ -312,37 +263,39 @@ function PendingApprovalState({
   )
 }
 
-// ─── Active Journey State ─────────────────────────────────────────────────────
+// ─── Active Journey Card ──────────────────────────────────────────────────────
 
-function ActiveJourneyState({
+function ActiveJourneyCard({
   journey,
   totalXp,
   onComplete,
+  onCancel,
   loading,
 }: {
   journey: JourneyDetail
   totalXp: number
   onComplete: (missionId: string) => void
+  onCancel: (id: string) => void
   loading: boolean
 }) {
   const currentLevel = journey.levels.find(l => l.id === journey.currentLevelId)
     || journey.levels.find(l => l.status === 'in_progress')
 
-  const currentMissions = journey.missions.filter(
-    m => m.levelId === (currentLevel?.id ?? '')
-  )
-
+  const currentMissions = journey.missions.filter(m => m.levelId === (currentLevel?.id ?? ''))
   const mainMission = currentMissions.find(m => m.type === 'main')
   const secondaryMissions = currentMissions.filter(m => m.type === 'secondary')
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Journey header */}
+      {/* Header */}
       <div className="bg-[var(--color-primary)] rounded-2xl p-4 text-white">
         <div className="flex items-center justify-between mb-3">
-          <div>
-            <div className="text-[11px] text-green-300 font-medium">Jornada ativa</div>
-            <h2 className="text-base font-bold mt-0.5">{journey.title}</h2>
+          <div className="flex items-center gap-2">
+            {journey.emoji && <span className="text-2xl">{journey.emoji}</span>}
+            <div>
+              <div className="text-[11px] text-green-300 font-medium">Jornada ativa</div>
+              <h2 className="text-base font-bold mt-0.5">{journey.title}</h2>
+            </div>
           </div>
           <div className="text-right">
             <div className="text-[11px] text-green-300">XP total</div>
@@ -352,8 +305,6 @@ function ActiveJourneyState({
             </div>
           </div>
         </div>
-
-        {/* Progress bars */}
         <div className="flex flex-col gap-2">
           <div>
             <div className="flex justify-between text-[11px] text-green-300 mb-1">
@@ -361,10 +312,7 @@ function ActiveJourneyState({
               <span>{journey.journeyProgress}%</span>
             </div>
             <div className="h-1.5 bg-white bg-opacity-20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white rounded-full transition-all duration-500"
-                style={{ width: `${journey.journeyProgress}%` }}
-              />
+              <div className="h-full bg-white rounded-full transition-all duration-500" style={{ width: `${journey.journeyProgress}%` }} />
             </div>
           </div>
           <div>
@@ -373,16 +321,13 @@ function ActiveJourneyState({
               <span>{journey.financialProgress.toFixed(0)}%</span>
             </div>
             <div className="h-1.5 bg-white bg-opacity-20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-300 rounded-full transition-all duration-500"
-                style={{ width: `${journey.financialProgress}%` }}
-              />
+              <div className="h-full bg-blue-300 rounded-full transition-all duration-500" style={{ width: `${journey.financialProgress}%` }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Current level highlight */}
+      {/* Nível atual */}
       {currentLevel && (
         <div className="bg-white rounded-2xl border border-[var(--color-primary)] p-4">
           <div className="flex items-center gap-2 mb-1">
@@ -396,7 +341,7 @@ function ActiveJourneyState({
         </div>
       )}
 
-      {/* Financial goal summary */}
+      {/* Meta financeira */}
       <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
         <div className="flex items-center gap-2 mb-3">
           <Target size={16} className="text-[var(--color-primary)]" />
@@ -422,22 +367,18 @@ function ActiveJourneyState({
         </div>
       </div>
 
-      {/* Next steps — main mission */}
+      {/* Missão principal */}
       {mainMission && (
         <div>
-          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">
-            🎯 Missão principal
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">🎯 Missão principal</h3>
           <MissionCard mission={mainMission} onComplete={onComplete} loading={loading} />
         </div>
       )}
 
-      {/* Secondary missions */}
+      {/* Missões secundárias */}
       {secondaryMissions.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">
-            ⭐ Missões secundárias
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">⭐ Missões secundárias</h3>
           <div className="flex flex-col gap-2">
             {secondaryMissions.map(m => (
               <MissionCard key={m.id} mission={m} onComplete={onComplete} loading={loading} />
@@ -446,11 +387,9 @@ function ActiveJourneyState({
         </div>
       )}
 
-      {/* All levels history */}
+      {/* Todas as etapas */}
       <div>
-        <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">
-          🗺️ Todas as etapas
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-text)] px-1 mb-2">🗺️ Todas as etapas</h3>
         <div className="flex flex-col gap-2">
           {journey.levels.map(level => (
             <LevelCard
@@ -464,43 +403,48 @@ function ActiveJourneyState({
           ))}
         </div>
       </div>
+
+      {/* Cancelar jornada */}
+      <button
+        onClick={() => onCancel(journey.id)}
+        disabled={loading}
+        className="w-full py-2.5 border border-[var(--color-border)] text-[var(--color-muted)] text-sm rounded-2xl hover:border-[var(--color-danger)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
+      >
+        Cancelar jornada
+      </button>
     </div>
   )
 }
 
-// ─── Completed Journey State ──────────────────────────────────────────────────
+// ─── Completed Journey Card ───────────────────────────────────────────────────
 
-function CompletedJourneyState({
+function CompletedJourneyCard({
   journey,
   totalXp,
-  onNewJourney,
-  loading,
 }: {
   journey: JourneyDetail
   totalXp: number
-  onNewJourney: () => void
-  loading: boolean
 }) {
   return (
-    <div className="flex flex-col items-center gap-6 py-8 text-center">
-      <div className="w-24 h-24 rounded-3xl bg-[var(--color-achievement)] bg-opacity-15 flex items-center justify-center">
-        <Trophy size={44} className="text-[var(--color-achievement)]" />
+    <div className="flex flex-col items-center gap-4 py-6 text-center">
+      <div className="w-20 h-20 rounded-3xl bg-[var(--color-achievement)] bg-opacity-15 flex items-center justify-center">
+        {journey.emoji
+          ? <span className="text-4xl">{journey.emoji}</span>
+          : <Trophy size={36} className="text-[var(--color-achievement)]" />
+        }
       </div>
       <div>
-        <h2 className="text-xl font-bold text-[var(--color-text)]">Sonho conquistado! 🎉</h2>
-        <p className="text-sm text-[var(--color-muted)] mt-2 max-w-xs leading-relaxed">
-          Você completou a jornada <strong>"{journey.title}"</strong> com sucesso!
+        <h2 className="text-lg font-bold text-[var(--color-text)]">Sonho conquistado! 🎉</h2>
+        <p className="text-sm text-[var(--color-muted)] mt-1 max-w-xs leading-relaxed">
+          Você completou <strong>"{journey.title}"</strong>!
         </p>
       </div>
-
       <div className="w-full bg-white rounded-2xl border border-[var(--color-border)] p-4 text-left">
-        <div className="text-sm font-semibold text-[var(--color-text)] mb-3">Retrospectiva</div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-[var(--color-primary-muted)] rounded-xl p-3">
             <div className="text-[10px] text-[var(--color-muted)]">XP acumulado</div>
             <div className="text-base font-bold text-[var(--color-primary)] flex items-center gap-1">
-              <Zap size={12} />
-              {totalXp}
+              <Zap size={12} />{totalXp}
             </div>
           </div>
           <div className="bg-[var(--color-primary-muted)] rounded-xl p-3">
@@ -509,23 +453,8 @@ function CompletedJourneyState({
               {journey.levels.length}/{journey.levels.length} ✓
             </div>
           </div>
-          <div className="col-span-2 bg-[var(--color-primary-muted)] rounded-xl p-3">
-            <div className="text-[10px] text-[var(--color-muted)]">Progresso financeiro final</div>
-            <div className="text-base font-bold text-[var(--color-primary)]">
-              R$ {journey.accumulatedAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} de R$ {journey.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </div>
-          </div>
         </div>
       </div>
-
-      <button
-        onClick={onNewJourney}
-        disabled={loading}
-        className="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-2xl disabled:opacity-50"
-      >
-        <Sparkles size={18} />
-        {loading ? 'Criando...' : 'Iniciar nova jornada'}
-      </button>
     </div>
   )
 }
@@ -538,10 +467,165 @@ function NotificationToast({ message, onDismiss }: { message: string; onDismiss:
       <div className="bg-[var(--color-primary)] text-white rounded-2xl px-4 py-3 flex items-start gap-3 shadow-lg">
         <Sparkles size={18} className="flex-shrink-0 mt-0.5" />
         <span className="text-sm flex-1">{message}</span>
-        <button onClick={onDismiss} className="flex-shrink-0">
-          <X size={16} />
+        <button onClick={onDismiss} className="flex-shrink-0"><X size={16} /></button>
+      </div>
+    </div>
+  )
+}
+
+// ─── New Dream Form ───────────────────────────────────────────────────────────
+
+function NewDreamForm({
+  onSave,
+  onCancel,
+  loading,
+}: {
+  onSave: (payload: Omit<FinancialGoal, 'id' | 'personaId' | 'progress'>) => void
+  onCancel: () => void
+  loading: boolean
+}) {
+  const [title, setTitle] = useState('')
+  const [emoji, setEmoji] = useState('✨')
+  const [targetAmount, setTargetAmount] = useState('')
+  const [currentAmount, setCurrentAmount] = useState('0')
+  const [deadline, setDeadline] = useState('')
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!title || !targetAmount || !deadline) return
+    onSave({
+      title,
+      emoji,
+      targetAmount: Number(targetAmount),
+      currentAmount: Number(currentAmount),
+      deadline,
+    })
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white border border-[var(--color-border)] rounded-2xl p-4 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm font-semibold">Novo sonho</p>
+        <button type="button" onClick={onCancel}><X size={18} className="text-[var(--color-muted)]" /></button>
+      </div>
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <input
+            value={emoji}
+            onChange={e => setEmoji(e.target.value)}
+            className="w-14 border border-[var(--color-border)] rounded-xl px-3 py-2 text-center text-lg"
+            maxLength={2}
+          />
+          <input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="Nome do sonho"
+            className="flex-1 border border-[var(--color-border)] rounded-xl px-3 py-2 text-sm"
+            required
+          />
+        </div>
+        <input
+          type="number"
+          value={targetAmount}
+          onChange={e => setTargetAmount(e.target.value)}
+          placeholder="Valor objetivo (R$)"
+          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2 text-sm"
+          required
+          min={1}
+        />
+        <input
+          type="number"
+          value={currentAmount}
+          onChange={e => setCurrentAmount(e.target.value)}
+          placeholder="Já tenho (R$)"
+          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2 text-sm"
+          min={0}
+        />
+        <input
+          type="date"
+          value={deadline}
+          onChange={e => setDeadline(e.target.value)}
+          className="w-full border border-[var(--color-border)] rounded-xl px-3 py-2 text-sm"
+          required
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2.5 bg-[var(--color-primary)] text-white rounded-xl text-sm font-medium disabled:opacity-50"
+        >
+          {loading ? 'Criando sonho...' : 'Criar sonho e jornada'}
         </button>
       </div>
+    </form>
+  )
+}
+
+// ─── Journey Card (dispatches by status) ─────────────────────────────────────
+
+function JourneyCard({
+  journey,
+  totalXp,
+  onApprove,
+  onCancel,
+  onComplete,
+  loading,
+}: {
+  journey: JourneyDetail
+  totalXp: number
+  onApprove: (id: string) => void
+  onCancel: (id: string) => void
+  onComplete: (missionId: string) => void
+  loading: boolean
+}) {
+  if (journey.status === 'pending_approval') {
+    return (
+      <PendingApprovalCard
+        journey={journey}
+        onApprove={onApprove}
+        onCancel={onCancel}
+        loading={loading}
+      />
+    )
+  }
+  if (journey.status === 'active') {
+    return (
+      <ActiveJourneyCard
+        journey={journey}
+        totalXp={totalXp}
+        onComplete={onComplete}
+        onCancel={onCancel}
+        loading={loading}
+      />
+    )
+  }
+  if (journey.status === 'completed') {
+    return <CompletedJourneyCard journey={journey} totalXp={totalXp} />
+  }
+  return null
+}
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+
+function EmptyState({ onAdd }: { onAdd: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center flex-1 px-6 py-16 text-center gap-6">
+      <div className="w-20 h-20 rounded-3xl bg-[var(--color-primary-muted)] flex items-center justify-center">
+        <Star size={36} className="text-[var(--color-primary)]" />
+      </div>
+      <div>
+        <h2 className="text-xl font-bold text-[var(--color-text)] mb-2">Qual é o seu próximo sonho?</h2>
+        <p className="text-sm text-[var(--color-muted)] max-w-xs leading-relaxed">
+          Adicione uma meta e transforme ela em uma jornada com níveis, missões e XP.
+        </p>
+      </div>
+      <button
+        onClick={onAdd}
+        className="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-2xl hover:bg-[var(--color-primary-light)] transition-colors"
+      >
+        <Sparkles size={18} />
+        Adicionar meu primeiro sonho
+        <ArrowRight size={16} />
+      </button>
     </div>
   )
 }
@@ -549,28 +633,32 @@ function NotificationToast({ message, onDismiss }: { message: string; onDismiss:
 // ─── Main View ────────────────────────────────────────────────────────────────
 
 export function DreamsView() {
+  const [showForm, setShowForm] = useState(false)
+
   const {
-    state,
+    journeys,
+    progress,
     loading,
     actionLoading,
     error,
     notification,
     dismissNotification,
-    handleCreateJourney,
+    handleCreateGoal,
     handleApproveJourney,
     handleCancelJourney,
     handleCompleteMission,
   } = useDreamsController()
 
-  const journey = state?.journey ?? null
-  const totalXp = state?.progress?.totalXp ?? 0
+  const totalXp = progress?.totalXp ?? 0
+
+  async function onFormSave(payload: Omit<FinancialGoal, 'id' | 'personaId' | 'progress'>) {
+    const result = await handleCreateGoal(payload)
+    if (result) setShowForm(false)
+  }
 
   return (
     <div className="max-w-lg mx-auto flex flex-col min-h-[calc(100dvh-var(--bottom-nav-height))] lg:min-h-dvh">
-      {/* Notification */}
-      {notification && (
-        <NotificationToast message={notification} onDismiss={dismissNotification} />
-      )}
+      {notification && <NotificationToast message={notification} onDismiss={dismissNotification} />}
 
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-6 pb-4 border-b border-[var(--color-border)] bg-[var(--color-bg)]">
@@ -578,23 +666,40 @@ export function DreamsView() {
           <Star size={18} className="text-[var(--color-primary)]" />
         </div>
         <div className="flex-1">
-          <h1 className="text-sm font-bold text-[var(--color-text)]">Sonhos</h1>
-          <p className="text-[10px] text-[var(--color-muted)]">Sua jornada financeira personalizada</p>
+          <h1 className="text-sm font-bold text-[var(--color-text)]">Meus Sonhos</h1>
+          <p className="text-[10px] text-[var(--color-muted)]">Cada meta vira uma jornada com níveis e missões</p>
         </div>
-        {totalXp > 0 && (
-          <div className="flex items-center gap-1 px-3 py-1.5 bg-[var(--color-achievement)] bg-opacity-10 rounded-xl">
-            <Zap size={13} className="text-[var(--color-achievement)]" />
-            <span className="text-xs font-bold text-[var(--color-achievement)]">{totalXp} XP</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {totalXp > 0 && (
+            <div className="flex items-center gap-1 px-2.5 py-1.5 bg-[var(--color-achievement)] bg-opacity-10 rounded-xl">
+              <Zap size={13} className="text-[var(--color-achievement)]" />
+              <span className="text-xs font-bold text-[var(--color-achievement)]">{totalXp} XP</span>
+            </div>
+          )}
+          <button
+            onClick={() => setShowForm(v => !v)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-[var(--color-primary)] text-white rounded-xl text-sm font-medium"
+          >
+            <Plus size={16} />
+            Novo
+          </button>
+        </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
+        {showForm && (
+          <NewDreamForm
+            onSave={onFormSave}
+            onCancel={() => setShowForm(false)}
+            loading={actionLoading}
+          />
+        )}
+
         {loading && (
           <div className="flex flex-col gap-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-24 bg-[var(--color-border)] rounded-2xl animate-pulse" />
+            {[1, 2].map(i => (
+              <div key={i} className="h-32 bg-[var(--color-border)] rounded-2xl animate-pulse" />
             ))}
           </div>
         )}
@@ -602,48 +707,27 @@ export function DreamsView() {
         {!loading && error && (
           <div className="bg-[var(--color-danger-light)] border border-[var(--color-danger)] rounded-2xl p-4 text-center">
             <p className="text-sm text-[var(--color-danger)]">{error}</p>
-            <button
-              onClick={handleCreateJourney}
-              className="mt-3 text-sm font-medium text-[var(--color-primary)] underline"
-            >
-              Tentar novamente
-            </button>
           </div>
         )}
 
-        {!loading && !error && !journey && (
-          <EmptyState onCreateJourney={handleCreateJourney} loading={actionLoading} />
+        {!loading && !error && journeys.length === 0 && !showForm && (
+          <EmptyState onAdd={() => setShowForm(true)} />
         )}
 
-        {!loading && !error && journey?.status === 'pending_approval' && (
-          <PendingApprovalState
-            journey={journey}
-            onApprove={handleApproveJourney}
-            onCancel={handleCancelJourney}
-            loading={actionLoading}
-          />
-        )}
-
-        {!loading && !error && journey?.status === 'active' && (
-          <ActiveJourneyState
-            journey={journey}
-            totalXp={totalXp}
-            onComplete={handleCompleteMission}
-            loading={actionLoading}
-          />
-        )}
-
-        {!loading && !error && journey?.status === 'completed' && (
-          <CompletedJourneyState
-            journey={journey}
-            totalXp={totalXp}
-            onNewJourney={handleCreateJourney}
-            loading={actionLoading}
-          />
-        )}
-
-        {!loading && !error && journey?.status === 'cancelled' && (
-          <EmptyState onCreateJourney={handleCreateJourney} loading={actionLoading} />
+        {!loading && !error && journeys.length > 0 && (
+          <div className="flex flex-col gap-10">
+            {journeys.map(journey => (
+              <JourneyCard
+                key={journey.id}
+                journey={journey}
+                totalXp={totalXp}
+                onApprove={handleApproveJourney}
+                onCancel={handleCancelJourney}
+                onComplete={handleCompleteMission}
+                loading={actionLoading}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

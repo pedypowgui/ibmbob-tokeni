@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid'
 import type { PersonaId, FinancialGoal } from '../models'
 import { GoalRepository } from '../repositories'
+import { JourneyService } from './journeyService'
 
 export const GoalService = {
   list(personaId: PersonaId): FinancialGoal[] {
@@ -24,7 +25,22 @@ export const GoalService = {
       ...payload,
       progress: Math.round(progress * 100) / 100,
     }
-    return GoalRepository.save(personaId, goal)
+    GoalRepository.save(personaId, goal)
+
+    // Criar jornada vinculada automaticamente
+    try {
+      JourneyService.createJourneyFromGoal(personaId, {
+        id: goal.id,
+        title: goal.title,
+        emoji: goal.emoji,
+        targetAmount: goal.targetAmount,
+        deadline: goal.deadline,
+      })
+    } catch {
+      // Jornada já existe para esta meta — ignorar silenciosamente
+    }
+
+    return goal
   },
 
   update(

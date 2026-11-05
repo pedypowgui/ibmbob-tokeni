@@ -40,6 +40,7 @@ router.post(
 )
 
 // ─── Jornadas / Sonhos ────────────────────────────────────────────────────────
+router.get('/journey/:personaId/all', validatePersona, JourneyController.getAllJourneys)
 router.get('/journey/:personaId', validatePersona, JourneyController.getJourney)
 router.post('/journey/:personaId', validatePersona, JourneyController.createJourney)
 router.post('/journey/:personaId/seed', validatePersona, JourneyController.createSeedJourney)

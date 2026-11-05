@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { usePersona } from '../../hooks/usePersona'
-import type { JourneyState } from '../../types'
+import type { JourneyDetail, UserProgress } from '../../types'
 import {
-  getJourney,
-  createSeedJourney,
+  getAllJourneys,
   approveJourney,
   cancelJourney,
   completeMission,
 } from './journeyService'
+import { createGoal } from '../goals/goalService'
+import type { FinancialGoal } from '../../types'
 
 export interface MissionCompletionResult {
   xpGained: number
@@ -17,7 +18,8 @@ export interface MissionCompletionResult {
 
 export function useDreamsController() {
   const { personaId } = usePersona()
-  const [state, setState] = useState<JourneyState | null>(null)
+  const [journeys, setJourneys] = useState<JourneyDetail[]>([])
+  const [progress, setProgress] = useState<UserProgress | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -28,8 +30,9 @@ export function useDreamsController() {
     setLoading(true)
     setError(null)
     try {
-      const data = await getJourney(personaId)
-      setState(data)
+      const data = await getAllJourneys(personaId)
+      setJourneys(data.journeys)
+      setProgress(data.progress)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar sonhos')
     } finally {
@@ -41,20 +44,26 @@ export function useDreamsController() {
     load()
   }, [load])
 
-  const handleCreateJourney = useCallback(async () => {
-    if (!personaId) return
-    setActionLoading(true)
-    setError(null)
-    try {
-      await createSeedJourney(personaId)
-      await load()
-      setNotification('Jornada criada! Revise os níveis e aprove para começar.')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar jornada')
-    } finally {
-      setActionLoading(false)
-    }
-  }, [personaId, load])
+  /** Cria uma meta + jornada vinculada ao mesmo tempo */
+  const handleCreateGoal = useCallback(
+    async (payload: Omit<FinancialGoal, 'id' | 'personaId' | 'progress'>): Promise<FinancialGoal | null> => {
+      if (!personaId) return null
+      setActionLoading(true)
+      setError(null)
+      try {
+        const goal = await createGoal(personaId, payload)
+        await load()
+        setNotification(`"${goal.title}" adicionado como sonho! Revise e aprove sua jornada. ✨`)
+        return goal
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao criar sonho')
+        return null
+      } finally {
+        setActionLoading(false)
+      }
+    },
+    [personaId, load],
+  )
 
   const handleApproveJourney = useCallback(async (journeyId: string) => {
     if (!personaId) return
@@ -96,7 +105,7 @@ export function useDreamsController() {
         await load()
         const msgs = [`+${result.xpGained} XP conquistados! 🌟`]
         if (result.levelAdvanced) msgs.push('Você avançou de nível! 🚀')
-        if (result.journeyCompleted) msgs.push('Jornada concluída! Parabéns! 🏆')
+        if (result.journeyCompleted) msgs.push('Sonho concluído! Parabéns! 🏆')
         setNotification(msgs.join(' '))
         return result
       } catch (err) {
@@ -112,13 +121,14 @@ export function useDreamsController() {
   const dismissNotification = useCallback(() => setNotification(null), [])
 
   return {
-    state,
+    journeys,
+    progress,
     loading,
     actionLoading,
     error,
     notification,
     dismissNotification,
-    handleCreateJourney,
+    handleCreateGoal,
     handleApproveJourney,
     handleCancelJourney,
     handleCompleteMission,

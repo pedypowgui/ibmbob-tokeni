@@ -250,7 +250,7 @@ const SEED_PROPOSALS: Record<PersonaId, JourneyProposal> = {
 // ─── Journey Service ──────────────────────────────────────────────────────────
 
 export const JourneyService = {
-  /** Retorna a jornada ativa ou pendente de aprovação, ou null */
+  /** Retorna a jornada ativa ou pendente de aprovação, ou null (legado) */
   getActiveJourney(profileId: PersonaId): (Journey & { levels: JourneyLevel[]; missions: JourneyMission[] }) | null {
     const journey = JourneyRepository.findActiveByPersona(profileId)
     if (!journey) return null
@@ -261,17 +261,26 @@ export const JourneyService = {
     }
   },
 
+  /** Retorna todas as jornadas da persona com níveis e missões */
+  getAllJourneys(profileId: PersonaId): (Journey & { levels: JourneyLevel[]; missions: JourneyMission[] })[] {
+    return JourneyRepository.findAllActiveByPersona(profileId).map(j => ({
+      ...j,
+      levels: LevelRepository.findByJourney(j.id),
+      missions: MissionRepository.findByJourney(j.id),
+    }))
+  },
+
   /** Retorna os dados de progresso do usuário */
   getUserProgress(profileId: PersonaId) {
     return UserProgressRepository.find(profileId)
   },
 
-  /** Cria uma jornada a partir de uma proposta (vindas do agente ou seed) */
-  createJourneyFromProposal(profileId: PersonaId, proposal: JourneyProposal): Journey {
-    // Não permite criar se já há uma ativa/pendente
-    const existing = JourneyRepository.findActiveByPersona(profileId)
-    if (existing) throw new Error('Já existe uma jornada ativa ou aguardando aprovação.')
-
+  /** Cria uma jornada a partir de uma proposta (pode haver múltiplas por persona) */
+  createJourneyFromProposal(
+    profileId: PersonaId,
+    proposal: JourneyProposal,
+    options?: { goalId?: string; emoji?: string },
+  ): Journey {
     const journeyId = nanoid()
     const now = new Date().toISOString()
 
@@ -290,6 +299,8 @@ export const JourneyService = {
       createdAt: now,
       approvedAt: null,
       updatedAt: now,
+      goalId: options?.goalId,
+      emoji: options?.emoji,
     }
 
     JourneyRepository.save(journey)
@@ -352,6 +363,140 @@ export const JourneyService = {
   createSeedJourney(profileId: PersonaId): Journey {
     const proposal = SEED_PROPOSALS[profileId]
     return JourneyService.createJourneyFromProposal(profileId, proposal)
+  },
+
+  /** Cria uma jornada a partir de uma FinancialGoal — gera níveis genéricos de progresso */
+  createJourneyFromGoal(
+    profileId: PersonaId,
+    goal: { id: string; title: string; emoji: string; targetAmount: number; deadline: string },
+  ): Journey {
+    // Verifica se já existe jornada para essa meta
+    const existing = JourneyRepository.findByGoalId(profileId, goal.id)
+    if (existing) throw new Error('Já existe uma jornada para esta meta.')
+
+    const monthsUntilDeadline = Math.max(
+      1,
+      Math.round(
+        (new Date(goal.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30),
+      ),
+    )
+
+    const proposal: JourneyProposal = {
+      title: goal.title,
+      description: `Jornada para alcançar o objetivo "${goal.title}" até ${new Date(goal.deadline).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}.`,
+      targetAmount: goal.targetAmount,
+      levels: [
+        {
+          order: 1,
+          title: 'Planejamento',
+          description: 'Defina como vai atingir sua meta.',
+          objective: 'Criar um plano de ação claro para o objetivo.',
+          mainMission: {
+            title: 'Faça seu planejamento',
+            description: `Defina quanto vai guardar por mês para atingir ${goal.title}.`,
+            rewardXp: 80,
+            completionType: 'manual',
+            completionCriteria: {
+              type: 'manual_confirmation',
+              description: 'Confirmar que criou seu plano mensal.',
+            },
+          },
+          secondaryMissions: [
+            {
+              title: 'Entenda sua meta',
+              description: `Para atingir R$ ${goal.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} em ${monthsUntilDeadline} meses, você precisa guardar R$ ${Math.ceil(goal.targetAmount / monthsUntilDeadline).toLocaleString('pt-BR')} por mês.`,
+              rewardXp: 30,
+              completionType: 'educational',
+              completionCriteria: {
+                type: 'educational',
+                description: 'Leia e entenda os números da sua meta.',
+              },
+            },
+          ],
+        },
+        {
+          order: 2,
+          title: 'Primeiros passos',
+          description: 'Comece a guardar dinheiro regularmente.',
+          objective: `Acumular 25% da meta (R$ ${Math.round(goal.targetAmount * 0.25).toLocaleString('pt-BR')}).`,
+          mainMission: {
+            title: 'Primeiro quarto',
+            description: `Acumule 25% do objetivo: R$ ${Math.round(goal.targetAmount * 0.25).toLocaleString('pt-BR')}.`,
+            rewardXp: 150,
+            completionType: 'financial',
+            completionCriteria: {
+              type: 'accumulated_amount',
+              description: 'Atingir 25% da meta financeira.',
+              targetValue: Math.round(goal.targetAmount * 0.25),
+              currentValue: 0,
+            },
+          },
+          secondaryMissions: [],
+        },
+        {
+          order: 3,
+          title: 'Na metade',
+          description: 'Mantenha o ritmo e chegue na metade.',
+          objective: `Acumular 50% da meta (R$ ${Math.round(goal.targetAmount * 0.5).toLocaleString('pt-BR')}).`,
+          mainMission: {
+            title: 'Metade do caminho',
+            description: `Acumule metade do objetivo: R$ ${Math.round(goal.targetAmount * 0.5).toLocaleString('pt-BR')}.`,
+            rewardXp: 200,
+            completionType: 'financial',
+            completionCriteria: {
+              type: 'accumulated_amount',
+              description: 'Atingir 50% da meta financeira.',
+              targetValue: Math.round(goal.targetAmount * 0.5),
+              currentValue: 0,
+            },
+          },
+          secondaryMissions: [],
+        },
+        {
+          order: 4,
+          title: 'Quase lá',
+          description: 'Você está na reta final!',
+          objective: `Acumular 75% da meta (R$ ${Math.round(goal.targetAmount * 0.75).toLocaleString('pt-BR')}).`,
+          mainMission: {
+            title: 'Três quartos',
+            description: `Acumule 75% do objetivo: R$ ${Math.round(goal.targetAmount * 0.75).toLocaleString('pt-BR')}.`,
+            rewardXp: 250,
+            completionType: 'financial',
+            completionCriteria: {
+              type: 'accumulated_amount',
+              description: 'Atingir 75% da meta financeira.',
+              targetValue: Math.round(goal.targetAmount * 0.75),
+              currentValue: 0,
+            },
+          },
+          secondaryMissions: [],
+        },
+        {
+          order: 5,
+          title: 'Conquista',
+          description: 'O objetivo está ao alcance!',
+          objective: `Atingir 100% da meta (R$ ${goal.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}).`,
+          mainMission: {
+            title: `${goal.title} conquistado!`,
+            description: `Acumule o valor total de R$ ${goal.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} para seu objetivo.`,
+            rewardXp: 400,
+            completionType: 'financial',
+            completionCriteria: {
+              type: 'accumulated_amount',
+              description: 'Atingir 100% da meta.',
+              targetValue: goal.targetAmount,
+              currentValue: 0,
+            },
+          },
+          secondaryMissions: [],
+        },
+      ],
+    }
+
+    return JourneyService.createJourneyFromProposal(profileId, proposal, {
+      goalId: goal.id,
+      emoji: goal.emoji,
+    })
   },
 
   /** Aprova a jornada pendente — ativa o primeiro nível */

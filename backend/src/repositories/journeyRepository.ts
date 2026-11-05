@@ -38,10 +38,27 @@ export const JourneyRepository = {
     return Array.from(journeys.values()).filter(j => j.profileId === profileId)
   },
 
+  /** Retorna todas as jornadas não-canceladas/concluídas de uma persona */
+  findAllActiveByPersona(profileId: PersonaId): Journey[] {
+    return Array.from(journeys.values()).filter(
+      j => j.profileId === profileId && j.status !== 'cancelled',
+    )
+  },
+
+  /** @deprecated use findAllActiveByPersona — mantido para compatibilidade */
   findActiveByPersona(profileId: PersonaId): Journey | null {
     return (
       Array.from(journeys.values()).find(
         j => j.profileId === profileId && (j.status === 'active' || j.status === 'pending_approval'),
+      ) ?? null
+    )
+  },
+
+  /** Verifica se já existe jornada ativa/pendente vinculada a uma meta específica */
+  findByGoalId(profileId: PersonaId, goalId: string): Journey | null {
+    return (
+      Array.from(journeys.values()).find(
+        j => j.profileId === profileId && j.goalId === goalId && j.status !== 'cancelled',
       ) ?? null
     )
   },

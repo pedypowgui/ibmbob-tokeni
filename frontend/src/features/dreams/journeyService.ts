@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   JourneyState,
+  AllJourneysState,
   Journey,
   XPHistory,
 } from '../../types'
@@ -11,6 +12,13 @@ export async function getJourney(personaId: string): Promise<JourneyState> {
   const res = await fetch(`${BASE}/journey/${personaId}`)
   const json: ApiResponse<JourneyState> = await res.json()
   if (!res.ok || json.error) throw new Error(json.error?.message || 'Erro ao carregar jornada')
+  return json.data!
+}
+
+export async function getAllJourneys(personaId: string): Promise<AllJourneysState> {
+  const res = await fetch(`${BASE}/journey/${personaId}/all`)
+  const json: ApiResponse<AllJourneysState> = await res.json()
+  if (!res.ok || json.error) throw new Error(json.error?.message || 'Erro ao carregar jornadas')
   return json.data!
 }
 

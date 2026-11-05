@@ -174,6 +174,8 @@ export interface Journey {
   createdAt: string
   approvedAt: string | null
   updatedAt: string
+  goalId?: string
+  emoji?: string
 }
 
 export interface JourneyDetail extends Journey {
@@ -200,5 +202,10 @@ export interface XPHistory {
 
 export interface JourneyState {
   journey: JourneyDetail | null
+  progress: UserProgress
+}
+
+export interface AllJourneysState {
+  journeys: JourneyDetail[]
   progress: UserProgress
 }

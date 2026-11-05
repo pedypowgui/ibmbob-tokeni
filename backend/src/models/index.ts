@@ -175,6 +175,8 @@ export interface Journey {
   createdAt: string
   approvedAt: string | null
   updatedAt: string
+  goalId?: string               // ID da FinancialGoal vinculada (se criada a partir de meta)
+  emoji?: string                // Emoji associado (herdado da meta)
 }
 
 export interface XPHistory {

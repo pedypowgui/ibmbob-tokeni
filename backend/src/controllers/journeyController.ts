@@ -40,12 +40,20 @@ const proposalSchema = z.object({
 // ─── Controller ───────────────────────────────────────────────────────────────
 
 export const JourneyController = {
-  /** GET /api/journey/:personaId — retorna jornada ativa + progresso */
+  /** GET /api/journey/:personaId — retorna jornada ativa + progresso (legado) */
   getJourney(req: Request, res: Response): void {
     const profileId = req.params.personaId as PersonaId
     const journey = JourneyService.getActiveJourney(profileId)
     const progress = JourneyService.getUserProgress(profileId)
     res.json(ok({ journey, progress }))
+  },
+
+  /** GET /api/journey/:personaId/all — retorna todas as jornadas + progresso */
+  getAllJourneys(req: Request, res: Response): void {
+    const profileId = req.params.personaId as PersonaId
+    const journeys = JourneyService.getAllJourneys(profileId)
+    const progress = JourneyService.getUserProgress(profileId)
+    res.json(ok({ journeys, progress }))
   },
 
   /** POST /api/journey/:personaId — cria jornada a partir de proposta */

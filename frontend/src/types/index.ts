@@ -116,3 +116,89 @@ export interface ApiResponse<T> {
   data: T | null
   error: { code: string; message: string } | null
 }
+
+// ─── Jornadas / Sistema de Sonhos ─────────────────────────────────────────────
+
+export type JourneyStatus = 'draft' | 'pending_approval' | 'active' | 'paused' | 'completed' | 'cancelled'
+export type LevelStatus = 'locked' | 'available' | 'in_progress' | 'completed'
+export type MissionType = 'main' | 'secondary' | 'weekly_challenge' | 'awareness'
+export type MissionStatus = 'locked' | 'available' | 'in_progress' | 'pending_validation' | 'completed' | 'skipped'
+export type CompletionType = 'automatic' | 'manual' | 'educational' | 'financial'
+
+export interface CompletionCriteria {
+  type: string
+  description: string
+  targetValue?: number
+  currentValue?: number
+}
+
+export interface JourneyMission {
+  id: string
+  journeyId: string
+  levelId: string
+  title: string
+  description: string
+  type: MissionType
+  completionType: CompletionType
+  completionCriteria: CompletionCriteria
+  rewardXp: number
+  status: MissionStatus
+  isRepeatable: boolean
+  weekKey?: string
+  completedAt: string | null
+}
+
+export interface JourneyLevel {
+  id: string
+  journeyId: string
+  title: string
+  description: string
+  order: number
+  objective: string
+  status: LevelStatus
+  completedAt: string | null
+}
+
+export interface Journey {
+  id: string
+  profileId: PersonaId
+  title: string
+  description: string
+  targetAmount: number
+  accumulatedAmount: number
+  currentLevelId: string | null
+  status: JourneyStatus
+  journeyProgress: number
+  financialProgress: number
+  version: number
+  createdAt: string
+  approvedAt: string | null
+  updatedAt: string
+}
+
+export interface JourneyDetail extends Journey {
+  levels: JourneyLevel[]
+  missions: JourneyMission[]
+}
+
+export interface UserProgress {
+  profileId: PersonaId
+  totalXp: number
+  completedMissions: string[]
+  unlockedAchievements: string[]
+}
+
+export interface XPHistory {
+  id: string
+  profileId: PersonaId
+  missionId: string
+  sourceId: string
+  amount: number
+  reason: string
+  createdAt: string
+}
+
+export interface JourneyState {
+  journey: JourneyDetail | null
+  progress: UserProgress
+}

@@ -1,12 +1,13 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ArrowLeftRight, PieChart, Star, Bot, LogOut } from 'lucide-react'
+import { LayoutDashboard, ArrowLeftRight, PieChart, Star, Bot, LogOut, Trophy } from 'lucide-react'
 import { usePersona } from '../hooks/usePersona'
 
 const navItems = [
   { to: '/dashboard', label: 'Início', Icon: LayoutDashboard },
   { to: '/transactions', label: 'Extrato', Icon: ArrowLeftRight },
   { to: '/budget', label: 'Orçamento', Icon: PieChart },
-  { to: '/goals', label: 'Sonhos', Icon: Star },
+  { to: '/dreams', label: 'Sonhos', Icon: Star },
+  { to: '/goals', label: 'Metas', Icon: Trophy },
   { to: '/assistant', label: 'Assistente', Icon: Bot },
 ]
 

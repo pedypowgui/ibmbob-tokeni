@@ -2,6 +2,8 @@ import type { PersonaId } from '../../models'
 import { DashboardService } from '../../services/dashboardService'
 import { BudgetService } from '../../services/budgetService'
 import { GoalService } from '../../services/goalService'
+import { JourneyService } from '../../services/journeyService'
+import { UserProgressRepository } from '../../repositories/journeyRepository'
 
 export interface FinancialContext {
   personaId: PersonaId
@@ -12,6 +14,11 @@ export interface FinancialContext {
   overBudgetCategories: string[]
   recentExpenses: Array<{ description: string; amount: number; category: string }>
   goals: Array<{ title: string; progress: number; targetAmount: number }>
+  hasActiveJourney: boolean
+  journeyTitle: string
+  journeyProgress: number
+  financialProgress: number
+  totalXp: number
 }
 
 export function buildContext(personaId: PersonaId): FinancialContext {
@@ -33,6 +40,9 @@ export function buildContext(personaId: PersonaId): FinancialContext {
       category: t.category,
     }))
 
+  const activeJourney = JourneyService.getActiveJourney(personaId)
+  const userProgress = UserProgressRepository.find(personaId)
+
   return {
     personaId,
     personaName,
@@ -46,5 +56,10 @@ export function buildContext(personaId: PersonaId): FinancialContext {
       progress: g.progress,
       targetAmount: g.targetAmount,
     })),
+    hasActiveJourney: activeJourney !== null,
+    journeyTitle: activeJourney?.title ?? '',
+    journeyProgress: activeJourney?.journeyProgress ?? 0,
+    financialProgress: activeJourney?.financialProgress ?? 0,
+    totalXp: userProgress.totalXp,
   }
 }

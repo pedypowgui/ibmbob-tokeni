@@ -1,0 +1,483 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JourneyService = void 0;
+const nanoid_1 = require("nanoid");
+const journeyRepository_1 = require("../repositories/journeyRepository");
+// ─── Seed data — jornadas simuladas por persona ───────────────────────────────
+const SEED_PROPOSALS = {
+    jose: {
+        title: 'Minha primeira moto',
+        description: 'Organize suas finanças para conquistar sua primeira moto com consciência e planejamento.',
+        targetAmount: 12000,
+        levels: [
+            {
+                order: 1,
+                title: 'Sonhador',
+                description: 'Conheça sua realidade financeira.',
+                objective: 'Identificar a situação financeira e definir a meta.',
+                mainMission: {
+                    title: 'Mapeie suas despesas',
+                    description: 'Identifique e categorize todas as suas despesas recorrentes do mês.',
+                    rewardXp: 100,
+                    completionType: 'automatic',
+                    completionCriteria: {
+                        type: 'expenses_categorized',
+                        description: 'Ter pelo menos 5 transações categorizadas no sistema.',
+                        targetValue: 5,
+                        currentValue: 0,
+                    },
+                },
+                secondaryMissions: [
+                    {
+                        title: 'Conheça seu orçamento',
+                        description: 'Acesse a tela de orçamento e confira onde seu dinheiro está indo.',
+                        rewardXp: 30,
+                        completionType: 'manual',
+                        completionCriteria: {
+                            type: 'viewed_budget',
+                            description: 'Confirmar que visualizou o painel de orçamento.',
+                        },
+                    },
+                ],
+            },
+            {
+                order: 2,
+                title: 'Explorador',
+                description: 'Identifique e comece a reorganizar seus gastos variáveis.',
+                objective: 'Reduzir gastos desnecessários e identificar espaço para poupar.',
+                mainMission: {
+                    title: 'Corte o supérfluo',
+                    description: 'Identifique pelo menos 2 categorias onde você pode reduzir gastos este mês.',
+                    rewardXp: 150,
+                    completionType: 'manual',
+                    completionCriteria: {
+                        type: 'identified_savings',
+                        description: 'Confirmar que identificou categorias com gastos reduzíveis.',
+                        targetValue: 2,
+                        currentValue: 0,
+                    },
+                },
+                secondaryMissions: [
+                    {
+                        title: 'Semana consciente',
+                        description: 'Registre todos os seus gastos por 7 dias seguidos.',
+                        rewardXp: 80,
+                        completionType: 'manual',
+                        completionCriteria: {
+                            type: 'week_tracked',
+                            description: 'Confirmar que acompanhou os gastos por 7 dias.',
+                        },
+                    },
+                    {
+                        title: 'Compare antes de comprar',
+                        description: 'Na próxima compra acima de R$100, compare ao menos 2 opções.',
+                        rewardXp: 50,
+                        completionType: 'manual',
+                        completionCriteria: {
+                            type: 'compared_purchase',
+                            description: 'Confirmar que comparou opções antes de comprar.',
+                        },
+                    },
+                ],
+            },
+            {
+                order: 3,
+                title: 'Construtor',
+                description: 'Organize o orçamento e comece a juntar dinheiro para a entrada.',
+                objective: 'Acumular pelo menos R$2.400 (20% da meta).',
+                mainMission: {
+                    title: 'Primeiro aporte',
+                    description: 'Separe R$200 por mês durante 3 meses para sua jornada.',
+                    rewardXp: 200,
+                    completionType: 'financial',
+                    completionCriteria: {
+                        type: 'accumulated_amount',
+                        description: 'Acumular pelo menos R$600 no fundo da moto.',
+                        targetValue: 600,
+                        currentValue: 0,
+                    },
+                },
+                secondaryMissions: [],
+            },
+            {
+                order: 4,
+                title: 'Conquistador',
+                description: 'Atingir a entrada e avaliar os custos totais da moto.',
+                objective: 'Alcançar a entrada de R$3.600 e pesquisar modelos.',
+                mainMission: {
+                    title: 'Entrada no bolso',
+                    description: 'Acumule o valor de entrada de 30% do objetivo.',
+                    rewardXp: 300,
+                    completionType: 'financial',
+                    completionCriteria: {
+                        type: 'accumulated_amount',
+                        description: 'Acumular pelo menos R$3.600.',
+                        targetValue: 3600,
+                        currentValue: 0,
+                    },
+                },
+                secondaryMissions: [
+                    {
+                        title: 'Pesquisador',
+                        description: 'Compare 3 modelos de moto e anote os custos de seguro, documentação e manutenção.',
+                        rewardXp: 60,
+                        completionType: 'educational',
+                        completionCriteria: {
+                            type: 'research_completed',
+                            description: 'Confirmar que pesquisou os custos totais.',
+                        },
+                    },
+                ],
+            },
+            {
+                order: 5,
+                title: 'Realizador',
+                description: 'Tomar uma decisão consciente e planejar os custos pós-compra.',
+                objective: 'Comprar a moto com planejamento e consciência.',
+                mainMission: {
+                    title: 'Decisão consciente',
+                    description: 'Planejar os custos mensais pós-compra (seguro, combustível, manutenção).',
+                    rewardXp: 400,
+                    completionType: 'manual',
+                    completionCriteria: {
+                        type: 'post_purchase_plan',
+                        description: 'Confirmar que criou o plano de custos pós-compra.',
+                    },
+                },
+                secondaryMissions: [],
+            },
+        ],
+    },
+    janaina: {
+        title: 'Reserva de emergência',
+        description: 'Construa uma reserva que proteja sua família de imprevistos com tranquilidade e pequenos passos.',
+        targetAmount: 5000,
+        levels: [
+            {
+                order: 1,
+                title: 'Organizadora',
+                description: 'Entenda para onde vai cada real da família.',
+                objective: 'Mapear todas as despesas fixas e variáveis.',
+                mainMission: {
+                    title: 'Lista de contas',
+                    description: 'Identifique todas as contas fixas mensais da família.',
+                    rewardXp: 80,
+                    completionType: 'automatic',
+                    completionCriteria: {
+                        type: 'expenses_categorized',
+                        description: 'Ter pelo menos 5 despesas categorizadas.',
+                        targetValue: 5,
+                        currentValue: 0,
+                    },
+                },
+                secondaryMissions: [
+                    {
+                        title: 'Revisão semanal',
+                        description: 'Reserve 15 minutos no domingo para revisar os gastos da semana.',
+                        rewardXp: 40,
+                        completionType: 'manual',
+                        completionCriteria: {
+                            type: 'weekly_review',
+                            description: 'Confirmar que fez a revisão semanal.',
+                        },
+                    },
+                ],
+            },
+            {
+                order: 2,
+                title: 'Guardiã',
+                description: 'Identificar onde é possível economizar sem sacrificar o essencial.',
+                objective: 'Encontrar R$200/mês de espaço para a reserva.',
+                mainMission: {
+                    title: 'Espaço para guardar',
+                    description: 'Identifique uma despesa variável que pode ser reduzida para criar espaço na reserva.',
+                    rewardXp: 120,
+                    completionType: 'manual',
+                    completionCriteria: {
+                        type: 'identified_savings',
+                        description: 'Confirmar que encontrou uma forma de economizar.',
+                    },
+                },
+                secondaryMissions: [
+                    {
+                        title: 'Mercado planejado',
+                        description: 'Faça uma lista antes de ir ao supermercado e siga ela.',
+                        rewardXp: 50,
+                        completionType: 'manual',
+                        completionCriteria: {
+                            type: 'planned_shopping',
+                            description: 'Confirmar que usou lista no supermercado.',
+                        },
+                    },
+                ],
+            },
+            {
+                order: 3,
+                title: 'Realizadora',
+                description: 'Construir a reserva de emergência completa.',
+                objective: 'Acumular R$5.000 na reserva.',
+                mainMission: {
+                    title: 'Reserva completa',
+                    description: 'Acumular R$5.000 guardados como reserva de emergência.',
+                    rewardXp: 500,
+                    completionType: 'financial',
+                    completionCriteria: {
+                        type: 'accumulated_amount',
+                        description: 'Ter pelo menos R$5.000 acumulados.',
+                        targetValue: 5000,
+                        currentValue: 0,
+                    },
+                },
+                secondaryMissions: [],
+            },
+        ],
+    },
+};
+// ─── Journey Service ──────────────────────────────────────────────────────────
+exports.JourneyService = {
+    /** Retorna a jornada ativa ou pendente de aprovação, ou null */
+    getActiveJourney(profileId) {
+        const journey = journeyRepository_1.JourneyRepository.findActiveByPersona(profileId);
+        if (!journey)
+            return null;
+        return {
+            ...journey,
+            levels: journeyRepository_1.LevelRepository.findByJourney(journey.id),
+            missions: journeyRepository_1.MissionRepository.findByJourney(journey.id),
+        };
+    },
+    /** Retorna os dados de progresso do usuário */
+    getUserProgress(profileId) {
+        return journeyRepository_1.UserProgressRepository.find(profileId);
+    },
+    /** Cria uma jornada a partir de uma proposta (vindas do agente ou seed) */
+    createJourneyFromProposal(profileId, proposal) {
+        // Não permite criar se já há uma ativa/pendente
+        const existing = journeyRepository_1.JourneyRepository.findActiveByPersona(profileId);
+        if (existing)
+            throw new Error('Já existe uma jornada ativa ou aguardando aprovação.');
+        const journeyId = (0, nanoid_1.nanoid)();
+        const now = new Date().toISOString();
+        const journey = {
+            id: journeyId,
+            profileId,
+            title: proposal.title,
+            description: proposal.description,
+            targetAmount: proposal.targetAmount,
+            accumulatedAmount: 0,
+            currentLevelId: null,
+            status: 'pending_approval',
+            journeyProgress: 0,
+            financialProgress: 0,
+            version: 1,
+            createdAt: now,
+            approvedAt: null,
+            updatedAt: now,
+        };
+        journeyRepository_1.JourneyRepository.save(journey);
+        // Criar níveis e missões
+        for (const levelDef of proposal.levels) {
+            const levelId = (0, nanoid_1.nanoid)();
+            const level = {
+                id: levelId,
+                journeyId,
+                title: levelDef.title,
+                description: levelDef.description,
+                order: levelDef.order,
+                objective: levelDef.objective,
+                status: 'locked',
+                completedAt: null,
+            };
+            journeyRepository_1.LevelRepository.save(level);
+            // Missão principal
+            const mainId = (0, nanoid_1.nanoid)();
+            journeyRepository_1.MissionRepository.save({
+                id: mainId,
+                journeyId,
+                levelId,
+                title: levelDef.mainMission.title,
+                description: levelDef.mainMission.description,
+                type: 'main',
+                completionType: levelDef.mainMission.completionType,
+                completionCriteria: levelDef.mainMission.completionCriteria,
+                rewardXp: levelDef.mainMission.rewardXp,
+                status: 'locked',
+                isRepeatable: false,
+                completedAt: null,
+            });
+            // Missões secundárias
+            for (const secDef of levelDef.secondaryMissions) {
+                journeyRepository_1.MissionRepository.save({
+                    id: (0, nanoid_1.nanoid)(),
+                    journeyId,
+                    levelId,
+                    title: secDef.title,
+                    description: secDef.description,
+                    type: 'secondary',
+                    completionType: secDef.completionType,
+                    completionCriteria: secDef.completionCriteria,
+                    rewardXp: secDef.rewardXp,
+                    status: 'locked',
+                    isRepeatable: false,
+                    completedAt: null,
+                });
+            }
+        }
+        return journey;
+    },
+    /** Carrega proposta seed para persona (fallback quando IA indisponível) */
+    createSeedJourney(profileId) {
+        const proposal = SEED_PROPOSALS[profileId];
+        return exports.JourneyService.createJourneyFromProposal(profileId, proposal);
+    },
+    /** Aprova a jornada pendente — ativa o primeiro nível */
+    approveJourney(profileId, journeyId) {
+        const journey = journeyRepository_1.JourneyRepository.findById(journeyId);
+        if (!journey || journey.profileId !== profileId)
+            throw new Error('Jornada não encontrada.');
+        if (journey.status !== 'pending_approval')
+            throw new Error('A jornada não está aguardando aprovação.');
+        journeyRepository_1.JourneyRepository.updateStatus(journeyId, 'active');
+        // Desbloquear o primeiro nível
+        const levels = journeyRepository_1.LevelRepository.findByJourney(journeyId);
+        if (levels.length > 0) {
+            const first = levels[0];
+            journeyRepository_1.LevelRepository.save({ ...first, status: 'in_progress' });
+            // Atualizar currentLevelId
+            const updated = journeyRepository_1.JourneyRepository.findById(journeyId);
+            updated.currentLevelId = first.id;
+            // Desbloquear missões do primeiro nível
+            const missions = journeyRepository_1.MissionRepository.findByLevel(first.id);
+            for (const m of missions) {
+                journeyRepository_1.MissionRepository.save({ ...m, status: 'available' });
+            }
+            journeyRepository_1.JourneyRepository.save(updated);
+        }
+        // Conceder XP de conquista "Primeiro passo"
+        journeyRepository_1.XPHistoryRepository.add({
+            id: (0, nanoid_1.nanoid)(),
+            profileId,
+            missionId: 'journey_created',
+            sourceId: journeyId,
+            amount: 50,
+            reason: 'Primeira jornada criada e aprovada!',
+            createdAt: new Date().toISOString(),
+        });
+        journeyRepository_1.UserProgressRepository.addXp(profileId, 50);
+        return journeyRepository_1.JourneyRepository.findById(journeyId);
+    },
+    /** Cancela a jornada */
+    cancelJourney(profileId, journeyId) {
+        const journey = journeyRepository_1.JourneyRepository.findById(journeyId);
+        if (!journey || journey.profileId !== profileId)
+            throw new Error('Jornada não encontrada.');
+        if (journey.status === 'completed' || journey.status === 'cancelled')
+            throw new Error('A jornada já está finalizada.');
+        journeyRepository_1.JourneyRepository.updateStatus(journeyId, 'cancelled');
+        return journeyRepository_1.JourneyRepository.findById(journeyId);
+    },
+    /** Completa uma missão — valida, concede XP e verifica avanço de nível */
+    completeMission(profileId, missionId) {
+        const mission = journeyRepository_1.MissionRepository.findById(missionId);
+        if (!mission)
+            throw new Error('Missão não encontrada.');
+        const journey = journeyRepository_1.JourneyRepository.findById(mission.journeyId);
+        if (!journey || journey.profileId !== profileId)
+            throw new Error('Missão não pertence à jornada do perfil.');
+        if (journey.status !== 'active')
+            throw new Error('A jornada não está ativa.');
+        if (mission.status === 'completed')
+            throw new Error('Missão já concluída.');
+        if (mission.status === 'locked')
+            throw new Error('Missão ainda está bloqueada.');
+        // Verificar duplicidade de XP
+        const weekKey = mission.weekKey;
+        const alreadyRewarded = journeyRepository_1.XPHistoryRepository.alreadyRewarded(profileId, missionId, weekKey);
+        if (alreadyRewarded && !mission.isRepeatable)
+            throw new Error('Esta missão já foi recompensada.');
+        // Concluir missão
+        journeyRepository_1.MissionRepository.updateStatus(missionId, 'completed');
+        journeyRepository_1.UserProgressRepository.markMissionComplete(profileId, missionId);
+        // Conceder XP
+        const xpEntry = {
+            id: (0, nanoid_1.nanoid)(),
+            profileId,
+            missionId,
+            sourceId: weekKey ? `${missionId}:${weekKey}` : missionId,
+            amount: mission.rewardXp,
+            reason: `Missão concluída: ${mission.title}`,
+            createdAt: new Date().toISOString(),
+        };
+        journeyRepository_1.XPHistoryRepository.add(xpEntry);
+        journeyRepository_1.UserProgressRepository.addXp(profileId, mission.rewardXp);
+        // Verificar se o nível pode avançar (missão principal concluída)
+        let levelAdvanced = false;
+        let journeyCompleted = false;
+        if (mission.type === 'main') {
+            const level = journeyRepository_1.LevelRepository.findById(mission.levelId);
+            if (level) {
+                journeyRepository_1.LevelRepository.complete(level.id);
+                levelAdvanced = true;
+                // Calcular progresso da jornada
+                const allLevels = journeyRepository_1.LevelRepository.findByJourney(journey.id);
+                const completedCount = allLevels.filter(l => l.status === 'completed').length;
+                const journeyProgress = Math.round((completedCount / allLevels.length) * 100);
+                const financialProgress = journey.targetAmount > 0
+                    ? Math.min(100, (journey.accumulatedAmount / journey.targetAmount) * 100)
+                    : 0;
+                journeyRepository_1.JourneyRepository.updateProgress(journey.id, journeyProgress, financialProgress);
+                // Verificar se a jornada foi concluída
+                if (completedCount === allLevels.length) {
+                    journeyRepository_1.JourneyRepository.updateStatus(journey.id, 'completed');
+                    journeyCompleted = true;
+                    // Bônus de conclusão
+                    journeyRepository_1.XPHistoryRepository.add({
+                        id: (0, nanoid_1.nanoid)(),
+                        profileId,
+                        missionId: 'journey_completed',
+                        sourceId: journey.id,
+                        amount: 500,
+                        reason: `Jornada concluída: ${journey.title}`,
+                        createdAt: new Date().toISOString(),
+                    });
+                    journeyRepository_1.UserProgressRepository.addXp(profileId, 500);
+                }
+                else {
+                    // Desbloquear próximo nível
+                    const nextLevel = allLevels.find(l => l.order === level.order + 1);
+                    if (nextLevel) {
+                        journeyRepository_1.LevelRepository.save({ ...nextLevel, status: 'in_progress' });
+                        // Atualizar currentLevelId
+                        const updatedJourney = journeyRepository_1.JourneyRepository.findById(journey.id);
+                        updatedJourney.currentLevelId = nextLevel.id;
+                        journeyRepository_1.JourneyRepository.save(updatedJourney);
+                        // Desbloquear missões do próximo nível
+                        const nextMissions = journeyRepository_1.MissionRepository.findByLevel(nextLevel.id);
+                        for (const m of nextMissions) {
+                            journeyRepository_1.MissionRepository.save({ ...m, status: 'available' });
+                        }
+                    }
+                }
+            }
+        }
+        return {
+            mission: journeyRepository_1.MissionRepository.findById(missionId),
+            xpGained: mission.rewardXp,
+            levelAdvanced,
+            journeyCompleted,
+        };
+    },
+    /** Atualiza o valor acumulado para calcular progresso financeiro */
+    updateAccumulatedAmount(profileId, journeyId, amount) {
+        const journey = journeyRepository_1.JourneyRepository.findById(journeyId);
+        if (!journey || journey.profileId !== profileId)
+            throw new Error('Jornada não encontrada.');
+        if (amount < 0)
+            throw new Error('Valor acumulado não pode ser negativo.');
+        return journeyRepository_1.JourneyRepository.updateAccumulated(journeyId, amount) ?? journey;
+    },
+    /** Retorna o histórico de XP do usuário */
+    getXpHistory(profileId) {
+        return journeyRepository_1.XPHistoryRepository.findByPersona(profileId);
+    },
+};

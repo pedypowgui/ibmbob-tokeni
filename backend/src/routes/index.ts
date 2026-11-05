@@ -7,6 +7,7 @@ import { BudgetController } from '../controllers/budgetController'
 import { GoalController } from '../controllers/goalController'
 import { GamificationController } from '../controllers/gamificationController'
 import { AssistantController } from '../controllers/assistantController'
+import { JourneyController } from '../controllers/journeyController'
 
 const router = Router()
 
@@ -37,6 +38,16 @@ router.post(
   validatePersona,
   GamificationController.completeMission,
 )
+
+// ─── Jornadas / Sonhos ────────────────────────────────────────────────────────
+router.get('/journey/:personaId', validatePersona, JourneyController.getJourney)
+router.post('/journey/:personaId', validatePersona, JourneyController.createJourney)
+router.post('/journey/:personaId/seed', validatePersona, JourneyController.createSeedJourney)
+router.post('/journey/:personaId/approve', validatePersona, JourneyController.approveJourney)
+router.post('/journey/:personaId/cancel', validatePersona, JourneyController.cancelJourney)
+router.post('/journey/:personaId/missions/:missionId/complete', validatePersona, JourneyController.completeMission)
+router.patch('/journey/:personaId/accumulated', validatePersona, JourneyController.updateAccumulated)
+router.get('/journey/:personaId/xp-history', validatePersona, JourneyController.getXpHistory)
 
 // ─── Assistant ────────────────────────────────────────────────────────────────
 router.post('/assistant/chat', AssistantController.chat)

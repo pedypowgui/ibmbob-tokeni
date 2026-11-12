@@ -19,7 +19,7 @@ A plataforma funciona com dados completamente fictícios e suporta duas personas
 
 ---
 
-## Tecnologia
+## Tecnologias
 
 | Camada | Stack |
 |---|---|
